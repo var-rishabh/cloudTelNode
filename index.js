@@ -4,7 +4,7 @@ const PORT = process.env.PORT || 3000;
 
 app.get('/ivr', (req, res) => {
 
-  console.log(req);
+  console.log(req.query);
 
   const customer = req.query.customer;
 
