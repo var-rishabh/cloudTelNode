@@ -15,13 +15,13 @@ app.get('/ivr', (req, res) => {
   const xml = `
     <response>
       <playtext type="ggl" quality="best" >Connecting you to the Runo Customer</playtext>
-      <dial>${customer}</dial>
+      <dial record="true" limittime="1000" timeout="30" moh="ring" >${customer}</dial>
     </response>
   `;
 
   const hangup_xml = `
     <response>
-      <hangup/>
+      <hangup></hangup>
     </response>
   `;
 
