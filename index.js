@@ -14,13 +14,30 @@ app.get('/ivr', (req, res) => {
 
   const xml = `
     <response>
-      <playtext>Connecting you to the Runo Customer</playtext>
+      <playtext type="ggl" quality="best" >Connecting you to the Runo Customer</playtext>
       <dial>${customer}</dial>
     </response>
   `;
 
+  const hangup_xml = `
+    <response>
+      <hangup/>
+    </response>
+  `;
+
   res.set('Content-Type', 'text/xml');
-  res.send(xml);
+  // res.send(xml);
+
+
+  if (req.query.event == "NewCall") {
+    res.send(xml);
+  } else if (req.query.event == "Dial" || (req.query.process == "dial" && req.query.event == "Hangup")) {
+    res.send(hangup_xml);
+  } else if (req.query.event == "Disconnect" || req.query.event == "Hangup") {
+    console.log(req.params);
+    // res.send(hangup_xml);
+  }
+
 });
 
 app.get('/', (req, res) => {
