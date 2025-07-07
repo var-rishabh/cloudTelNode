@@ -35,7 +35,7 @@ app.get('/ivr', (req, res) => {
     res.send(hangup_xml);
   } else if (req.query.event == "Disconnect" || req.query.event == "Hangup") {
     console.log(req.params);
-    // res.send(hangup_xml);
+    res.send(hangup_xml);
   }
 
 });
