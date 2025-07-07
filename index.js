@@ -26,7 +26,6 @@ app.get('/ivr', (req, res) => {
   `;
 
   res.set('Content-Type', 'text/xml');
-  // res.send(xml);
 
 
   if (req.query.event == "NewCall") {
@@ -35,6 +34,35 @@ app.get('/ivr', (req, res) => {
     res.send(hangup_xml);
   } else if (req.query.event == "Disconnect" || req.query.event == "Hangup") {
     console.log(req.params);
+    res.send(hangup_xml);
+  }
+
+});
+
+app.get('/ivr/inbound', (req, res) => {
+
+  console.log(req.query);
+
+  const called_number = req.query.called_number;
+
+  const xml = `
+    <response>
+      <playtext type="ggl" quality="best" >Connecting you to the Runo Agent</playtext>
+      <dial record="true" limittime="1000" timeout="30" moh="ring" >${called_number}</dial>
+    </response>
+  `;
+
+  const hangup_xml = `
+    <response>
+      <hangup></hangup>
+    </response>
+  `;
+
+  res.set('Content-Type', 'text/xml');
+
+  if (req.query.event == "NewCall") {
+    res.send(xml);
+  } else {
     res.send(hangup_xml);
   }
 
