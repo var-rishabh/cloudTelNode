@@ -15,7 +15,7 @@ app.get('/ivr', (req, res) => {
   const xml = `
     <response>
       <playtext type="ggl" quality="best" >Connecting you to the Runo Customer</playtext>
-      <dial record="true" limittime="1000" timeout="30" moh="ring" >${customer}</dial>
+      <dial record="true" limittime="1000" timeout="30" moh="telco_ring" >${customer}</dial>
     </response>
   `;
 
