@@ -1,6 +1,14 @@
 const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const twilio = require('twilio');
+const bodyParser = require('body-parser');
+
+const PORT = 3000;
+
+const { urlencoded } = bodyParser;
+
+app.use(urlencoded({ extended: false }));
+app.use(express.json());
 
 app.get('/ivr', (req, res) => {
 
@@ -68,8 +76,73 @@ app.get('/ivr/inbound', (req, res) => {
 
 });
 
+// /customer-status
+app.post('/customer-status', (req, res) => {
+  console.log('[Customer Event]');
+  console.log(JSON.stringify(req.body, null, 2));
+
+  const event = req.body;
+  const log = {
+    callSid: event.CallSid,
+    status: event.CallStatus,
+    from: event.From,
+    to: event.To,
+    direction: event.Direction,
+    timestamp: new Date().toISOString()
+  };
+  console.log('[Customer Log]', log);
+  res.send('Customer Status Received');
+});
+
+// /agent-status
+app.post('/agent-status', (req, res) => {
+  console.log('[AGENT Event]');
+  console.log(JSON.stringify(req.body, null, 2));
+
+  const event = req.body;
+  const log = {
+    callSid: event.CallSid,
+    status: event.CallStatus,
+    from: event.From,
+    to: event.To,
+    direction: event.Direction,
+    timestamp: new Date().toISOString()
+  };
+  console.log('[Agent Log]', log);
+  res.send('Agent Status Received');
+});
+
+// /agent-bridge
+app.post('/agent-bridge', (req, res) => {
+  const customerNumber = req.query.customerNumber;
+  console.log('=== Agent Bridge ===');
+  console.log(JSON.stringify(req.query, null, 2));
+
+  if (!customerNumber) {
+    console.error('Missing customer number');
+    return res.status(400).send('Customer number is required');
+  }
+
+  const twiml = new twilio.twiml.VoiceResponse();
+  twiml.say('Connecting you to the customer.');
+
+  const dial = twiml.dial({
+    callerId: '+13167106323',
+  });
+
+  dial.number({
+    statusCallback: `${process.env.RENDER_URL}/customer-status`,
+    statusCallbackEvent: 'initiated ringing answered completed',
+    statusCallbackMethod: 'POST',
+  }, customerNumber);
+
+  console.log('Dial TwiML:', twiml.toString());
+  res.type('text/xml');
+  res.send(twiml.toString());
+});
+
 app.get('/', (req, res) => {
-  res.send('Runo X Ozonetel');
+  res.send('Runo X Ozonetel X Twilio');
 });
 
 app.listen(PORT, () => {
